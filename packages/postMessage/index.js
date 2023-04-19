@@ -1,9 +1,11 @@
 // 定义一个 WorkerMessage 类，用于向 Worker 发送消息并处理返回结果
+
+let canStructuredClone = true;
+
 export class WorkerMessage {
     constructor(workerUrl) {
         this.worker = new Worker(workerUrl);
         this.callbacks = new Map();
-        this.canStructuredClone = true;
         this.isStructuredCloneSupported();
 
         // 监听从 Worker 返回的消息
@@ -34,7 +36,7 @@ export class WorkerMessage {
     // 发送消息给 Worker
     postMessage(payload) {
         const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
-        const message = this.canStructuredClone ? {id, payload} : JSON.stringify({id, payload})
+        const message = canStructuredClone ? {id, payload} : JSON.stringify({id, payload})
         this.worker.postMessage(message);
         return new Promise((resolve, reject) => {
             this.callbacks.set(id, {resolve, reject});
@@ -51,10 +53,10 @@ export class WorkerMessage {
         try {
             const obj = {data: 'Hello'};
             const clonedObj = window.postMessage ? window.postMessage(obj, '*') : obj;
-            return this.canStructuredClone = clonedObj !== obj;
+            return canStructuredClone = clonedObj !== obj;
         } catch (error) {
             // 捕获到异常，说明浏览器不支持结构化克隆
-            this.canStructuredClone = false;
+            canStructuredClone = false;
             return false;
         }
     }
