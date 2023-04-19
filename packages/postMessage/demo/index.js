@@ -6,7 +6,7 @@ console.log('WorkerMessage start')
 const worker = new WorkerMessage('./worker.js');
 
 // 发送一个消息给 Worker，并处理返回结果
-worker.postMessage({ type: 'CALCULATE', payload: 10 }).then(
+worker.postMessage({type: 'CALCULATE', payload: 10}).then(
     result => {
         console.log('计算结果：', result);
     },
@@ -17,3 +17,12 @@ worker.postMessage({ type: 'CALCULATE', payload: 10 }).then(
 
 // 关闭 Worker 实例
 // worker.terminate();
+
+worker.postMessage({type: 'PLUS', payload: 10}).then(
+    result => {
+        console.log('计算结果：', result);
+    },
+    error => {
+        console.error('计算出错：', error);
+    }
+);

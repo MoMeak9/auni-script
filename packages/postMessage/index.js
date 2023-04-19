@@ -1,12 +1,12 @@
 // 定义一个 WorkerMessage 类，用于向 Worker 发送消息并处理返回结果
-class WorkerMessage {
+export class WorkerMessage {
     constructor(workerUrl) {
         this.worker = new Worker(workerUrl);
         this.callbacks = new Map();
 
         // 监听从 Worker 返回的消息
         this.worker.addEventListener('message', event => {
-            const { id, type, payload } = event.data;
+            const {id, type, payload} = event.data;
             const callback = this.callbacks.get(id);
 
             if (!callback) {
@@ -33,10 +33,9 @@ class WorkerMessage {
     postMessage(payload) {
         const id = Date.now().toString(36) + Math.random().toString(36).substr(2);
         const message = { id, payload };
-        console.log('postMessage', message)
         this.worker.postMessage(message);
         return new Promise((resolve, reject) => {
-            this.callbacks.set(id, { resolve, reject });
+            this.callbacks.set(id, {resolve, reject});
         });
     }
 
@@ -45,5 +44,7 @@ class WorkerMessage {
         this.worker.terminate();
     }
 }
+
+
 
 export default WorkerMessage;
