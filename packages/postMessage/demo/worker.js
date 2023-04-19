@@ -48,7 +48,7 @@ const child = new childMessage(self, {
     PLUS: doPlus
 });
 
+// 起到分发执行的效果
 child.addEventListener(()=>{
     console.log('worker is listened');
 });
-
