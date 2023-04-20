@@ -12,6 +12,8 @@ function doPlus(num) {
     });
 }
 
+let canStructuredClone = true;
+
 class childMessage {
     constructor(self, config) {
         this.self = self;
@@ -24,18 +26,26 @@ class childMessage {
             const {id, payload} = event.data;
             const {type} = payload;
             try {
-                const res = this.config[type](payload.payload);
+                const res = this.config[type](canStructuredClone ? payload.payload : JSON.parse(payload.payload));
                 if (res instanceof Promise) {
                     res.then(data => {
-                        this.self.postMessage({id, type: 'SUCCESS', payload: data});
+                        this.self.postMessage({
+                            id,
+                            type: 'SUCCESS',
+                            payload: canStructuredClone ? data : JSON.stringify(data)
+                        });
                     }).catch(e => {
-                        this.self.postMessage({id, type: 'ERROR', payload: e});
+                        this.self.postMessage({id, type: 'ERROR', payload: e.toString()});
                     });
                 } else {
-                    this.self.postMessage({id, type: 'SUCCESS', payload: res});
+                    this.self.postMessage({
+                        id,
+                        type: 'SUCCESS',
+                        payload: canStructuredClone ? res : JSON.stringify(res)
+                    });
                 }
             } catch (e) {
-                this.self.postMessage({id, type: 'ERROR', payload: e});
+                this.self.postMessage({id, type: 'ERROR', payload: e.toString()});
             } finally {
                 callback?.();
             }
